@@ -1,0 +1,27 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "inspect-openreward"
+version = "0.1.0"
+description = "Bridge between Inspect AI tools and the OpenReward specification."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "inspect-ai",
+    "openreward>=0.1.92",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/inspect_openreward"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
