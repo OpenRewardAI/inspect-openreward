@@ -1,16 +1,4 @@
-"""Inspect AI task factory for OpenReward environments.
-
-Provides a high-level ``openreward()`` task factory (analogous to
-``harbor()`` in inspect_harbor) that fetches tasks from a named OpenReward
-environment and evaluates an agent against each one.
-
-Layer structure
----------------
-* **Low-level** – :func:`inspect_openreward.openreward_tool_to_inspect`:
-  converts a single OR ``ToolSpec`` + ``Session`` into an Inspect ``Tool``.
-* **High-level** (this module) – :func:`openreward`, :func:`openreward_solver`,
-  :func:`openreward_scorer`: manage the full task/environment lifecycle.
-"""
+"""Inspect AI task factory for OpenReward environments."""
 
 from __future__ import annotations
 
@@ -23,9 +11,7 @@ from inspect_ai.dataset import Sample
 from inspect_ai.model import ChatMessageUser, ContentImage, ContentText
 from inspect_ai.scorer import Score, Scorer, Target, mean, scorer, stderr
 from inspect_ai.solver import Generate, Solver, TaskState, solver
-from inspect_ai.tool._tool import Tool
-from inspect_ai.tool._tool_def import ToolDef
-from inspect_ai.tool._tool_params import ToolParams
+from inspect_ai.tool import Tool, ToolDef, ToolParams
 
 from openreward import AsyncOpenReward, OpenReward
 from openreward.api.environments.types import (
@@ -36,19 +22,8 @@ from openreward.api.environments.types import (
 )
 
 
-# ---------------------------------------------------------------------------
-# Internal helpers
-# ---------------------------------------------------------------------------
-
-
 class _RewardTracker:
-    """Accumulates the reward signal emitted across tool calls in a session.
-
-    OpenReward returns a ``reward`` float and a ``finished`` flag on every
-    ``call_tool`` response.  We keep the *last* non-None reward value, which
-    is the standard pattern for environments that only signal reward at the
-    end of an episode, and record whether any call marked the episode as done.
-    """
+    """Accumulates reward/finished signals across tool calls in a session."""
 
     def __init__(self) -> None:
         self.reward: float = 0.0
@@ -63,16 +38,10 @@ class _RewardTracker:
 
 def _make_async_tool(
     tool_spec: ToolSpec,
-    session: Any,  # openreward.api.environments.client.AsyncSession
+    session: Any,
     tracker: _RewardTracker,
 ) -> Tool:
-    """Create an Inspect Tool backed by an async OR session.
-
-    Wraps ``session.call_tool`` so that every invocation updates *tracker*
-    with the latest reward and finished state.  When the environment signals
-    episode completion (``finished=True``), the tool appends
-    ``"[Episode complete]"`` to its return value so the model knows to submit.
-    """
+    """Create an Inspect Tool backed by an async OR session."""
     name = tool_spec.name
 
     async def execute(**kwargs: Any) -> str:
@@ -94,9 +63,7 @@ def _make_async_tool(
 def _blocks_to_input(
     blocks: list[TextBlock | ImageBlock],
 ) -> str | list[ContentText | ContentImage]:
-    """Convert OR prompt blocks to an Inspect message content value."""
-    if not blocks:
-        return ""
+    """Convert OR prompt blocks to Inspect message content."""
     if len(blocks) == 1 and isinstance(blocks[0], TextBlock):
         return blocks[0].text
     content: list[ContentText | ContentImage] = []
@@ -107,16 +74,14 @@ def _blocks_to_input(
             content.append(
                 ContentImage(image=f"data:{block.mimeType};base64,{block.data}")
             )
-    return content
+    return content or ""
 
 
 def _or_task_to_sample(or_task: ORTask, idx: int) -> Sample:
     """Convert an OpenReward Task to an Inspect Sample.
 
-    The real prompt is fetched lazily by :func:`openreward_solver` when the
-    session opens, so the Sample input is a lightweight placeholder.  Task
-    routing information is stored in ``metadata`` for the solver to
-    reconstruct the ``ORTask``.
+    The real prompt is fetched lazily when the session opens, so the
+    Sample input here is a placeholder for display purposes.
     """
     return Sample(
         input=f"OpenReward task {idx} ({or_task.environment_name})",
@@ -135,11 +100,7 @@ def _load_samples(
     split: str,
     n_tasks: int | None,
 ) -> list[Sample]:
-    """Fetch OR tasks at task-definition time and convert to Inspect Samples.
-
-    Uses the synchronous ``OpenReward`` client so this can be called from
-    ordinary (non-async) task-factory code.
-    """
+    """Fetch OR tasks synchronously and convert to Inspect Samples."""
     with OpenReward() as client:
         env = client.environments.get(name=environment_name)
         or_tasks = env.list_tasks(split=split)
@@ -150,9 +111,20 @@ def _load_samples(
     return [_or_task_to_sample(t, idx) for idx, t in enumerate(or_tasks)]
 
 
-# ---------------------------------------------------------------------------
-# Public solver / scorer / task
-# ---------------------------------------------------------------------------
+@scorer(metrics=[mean(), stderr()])
+def _openreward_scorer() -> Scorer:
+    """Reads the reward signal stored by openreward_solver."""
+
+    async def score(state: TaskState, target: Target) -> Score:  # noqa: ARG001
+        reward = float(state.metadata.get("or_reward", 0.0))
+        finished = bool(state.metadata.get("or_finished", False))
+        return Score(
+            value=reward,
+            answer="FINISHED" if finished else "UNFINISHED",
+            explanation=f"reward={reward}, finished={finished}",
+        )
+
+    return score
 
 
 @solver
@@ -161,30 +133,13 @@ def openreward_solver(
 ) -> Solver:
     """Solver that manages an OpenReward session and runs an agent.
 
-    For each sample the solver:
-
-    1. Reconstructs the ``ORTask`` from ``state.metadata``.
-    2. Opens an async OR session for that task.
-    3. Fetches the real prompt and replaces the placeholder in ``state.messages``.
-    4. Converts every OR tool into an Inspect tool that also updates a
-       :class:`_RewardTracker`.
-    5. Calls *agent* with the session's tools to obtain an :class:`~inspect_ai.agent.Agent`,
-       then runs it via :func:`~inspect_ai.agent.as_solver`.
-    6. After the session closes, writes ``or_reward`` and ``or_finished`` into
-       ``state.metadata`` for the scorer to consume.
-
-    A single ``AsyncOpenReward`` client is created per solver instance and
-    shared across all samples, allowing connection re-use.
+    Opens an async OR session per sample, fetches the real prompt,
+    converts OR tools into Inspect tools with reward tracking, and
+    delegates to the agent.
 
     Args:
-        agent: A callable that receives the list of OR-backed
-            :class:`~inspect_ai.tool.Tool` objects and returns an
-            :class:`~inspect_ai.agent.Agent`.  Defaults to
-            ``lambda tools: react(tools=tools)``.  Use this to customise the
-            agent — for example to set ``max_attempts``, add system prompts, or
-            swap in a different agent implementation entirely::
-
-                openreward_solver(agent=lambda tools: react(tools=tools, max_attempts=10))
+        agent: Factory receiving OR-backed tools and returning an Agent.
+            Defaults to ``react(tools=tools)``.
     """
     agent_factory: Callable[[list[Tool]], Agent] = agent or (
         lambda tools: react(tools=tools)
@@ -204,11 +159,9 @@ def openreward_solver(
         tracker = _RewardTracker()
 
         async with env.session(task=or_task) as session:
-            # Replace placeholder input with the real task prompt
             prompt_blocks = await session.get_prompt()
             state.messages = [ChatMessageUser(content=_blocks_to_input(prompt_blocks))]
 
-            # Build Inspect tools, wired to this session and reward tracker
             tool_specs = await session.list_tools()
             tools = [_make_async_tool(spec, session, tracker) for spec in tool_specs]
 
@@ -221,64 +174,30 @@ def openreward_solver(
     return solve
 
 
-@scorer(metrics=[mean(), stderr()])
-def openreward_scorer() -> Scorer:
-    """Scorer that reads the reward signal stored by :func:`openreward_solver`.
-
-    Returns a :class:`~inspect_ai.scorer.Score` whose ``value`` is the final
-    reward emitted by the OpenReward environment during the agent's session.
-    """
-
-    async def score(state: TaskState, target: Target) -> Score:  # noqa: ARG001
-        reward = float(state.metadata.get("or_reward", 0.0))
-        finished = bool(state.metadata.get("or_finished", False))
-        return Score(
-            value=reward,
-            answer="FINISHED" if finished else "UNFINISHED",
-            explanation=(
-                f"OpenReward reward: {reward}. "
-                f"Session finished: {finished}."
-            ),
-        )
-
-    return score
-
-
 @task
 def openreward(
     environment: str,
     split: str = "train",
     n_tasks: int | None = None,
     agent: Callable[[list[Tool]], Agent] | None = None,
+    **task_kwargs: Any,
 ) -> Task:
     """Inspect Task backed by an OpenReward environment.
-
-    Fetches tasks from the named OpenReward environment and evaluates an agent
-    against each one, using the environment's tools and reward signal.
 
     Args:
         environment: OpenReward environment name,
             e.g. ``"kanishk/EndlessTerminals"``.
-        split: Dataset split to use (default: ``"train"``).
-        n_tasks: Maximum number of tasks to include. All tasks if ``None``.
-        agent: A callable that receives the list of OR-backed
-            :class:`~inspect_ai.tool.Tool` objects and returns an
-            :class:`~inspect_ai.agent.Agent`.  Defaults to
-            ``lambda tools: react(tools=tools)``.  Use this to customise the
-            agent — for example to set ``max_attempts``, add system prompts, or
-            swap in a different agent implementation entirely::
-
-                openreward(
-                    "kanishk/EndlessTerminals",
-                    agent=lambda tools: react(tools=tools, max_attempts=10),
-                )
-
-    Returns:
-        Configured Inspect AI task.
+        split: Dataset split (default ``"train"``).
+        n_tasks: Cap on number of tasks. ``None`` for all.
+        agent: Factory receiving OR-backed tools and returning an Agent.
+            Defaults to ``react(tools=tools)``.
+        **task_kwargs: Passed through to ``Task()`` — e.g.
+            ``message_limit``, ``epochs``, ``sandbox``.
     """
     samples = _load_samples(environment, split, n_tasks)
     return Task(
         dataset=samples,
         solver=openreward_solver(agent=agent),
-        scorer=openreward_scorer(),
+        scorer=_openreward_scorer(),
+        **task_kwargs,
     )
