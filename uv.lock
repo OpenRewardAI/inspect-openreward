@@ -1,6 +1,10 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.11"
+
+[options]
+exclude-newer = "2026-04-09T11:01:41.113594008Z"
+exclude-newer-span = "P1W"
 
 [[package]]
 name = "aioboto3"
