@@ -5,3 +5,6 @@ dist/
 build/
 .pytest_cache/
 *.pyc
+.claude
+.idea
+**.eval

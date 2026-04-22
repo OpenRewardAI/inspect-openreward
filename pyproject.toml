@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "inspect-ai",
-    "openreward>=0.1.92",
+    "openreward>=0.1.104",
 ]
 
 [dependency-groups]
@@ -25,3 +25,6 @@ packages = ["src/inspect_openreward"]
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
+
+#[tool.uv.sources]
+#openreward = { path = "../gr/or/python-sdk" }

@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.11"
 
 [[package]]
@@ -941,7 +941,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "inspect-ai" },
-    { name = "openreward", specifier = ">=0.1.92" },
+    { name = "openreward", specifier = ">=0.1.104" },
 ]
 
 [package.metadata.requires-dev]
@@ -1496,7 +1496,7 @@ wheels = [
 
 [[package]]
 name = "openreward"
-version = "0.1.92"
+version = "0.1.104"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -1506,15 +1506,16 @@ dependencies = [
     { name = "google-genai" },
     { name = "openai" },
     { name = "pydantic" },
+    { name = "pyyaml" },
     { name = "sse-starlette" },
     { name = "structlog" },
     { name = "tenacity" },
     { name = "typing-extensions" },
     { name = "uvicorn" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/be/af/1e3c716f4a129ca0a21d2c5f286eb532e97834957a19cae4e3433ef407cb/openreward-0.1.92.tar.gz", hash = "sha256:b3c5c2509a9a7a8b18c8a50397c0b0858d759fd31c1b51fd70a2f436010702e9", size = 90605, upload-time = "2026-04-08T11:56:59.221Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c7/94/3e20eee8058f5699b3034635ad649a0d4a45ce9c7285dc80f7d04d480a70/openreward-0.1.104.tar.gz", hash = "sha256:b1115bf78510db0bf09a8ab4b7705389180e00e03160d2a7c9c4a1f79416fa44", size = 124199, upload-time = "2026-04-22T15:12:55.003Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/57/51/adf22f96f61f442ba20c6bd362b70385766ce3e7ca06637bcfb1d165df95/openreward-0.1.92-py3-none-any.whl", hash = "sha256:3dfab3001a1dd62fc3b33a2d80e30d915eef684fc87d217fb6bcc21f8437fb3b", size = 92824, upload-time = "2026-04-08T11:57:00.16Z" },
+    { url = "https://files.pythonhosted.org/packages/67/c7/8071f4cde601646b6cc052303acc80cf55a3cc378b2915838ae32b696538/openreward-0.1.104-py3-none-any.whl", hash = "sha256:ccbf2942789458d650fa2998a8eeefbddb23b8e6192dd0aa20696ef3bde4ef4b", size = 125233, upload-time = "2026-04-22T15:12:53.613Z" },
 ]
 
 [[package]]
