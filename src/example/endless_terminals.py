@@ -31,6 +31,7 @@ def endless_terminals() -> Task:
 def main() -> None:
     load_dotenv()
     eval(endless_terminals, model=f"openai/{MODEL_NAME}")
+    print("")
 
 
 if __name__ == "__main__":

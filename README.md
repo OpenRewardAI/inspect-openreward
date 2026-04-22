@@ -45,8 +45,7 @@ if __name__ == "__main__":
     eval(endless_terminals, model="openai/gpt-5.4")
 ```
 
-See [`examples/endless_terminals.py`](examples/endless_terminals.py) for a runnable 
-version.
+See [`./src/example/endless_terminals.py`](examples/endless_terminals.py) for a runnable version.
 
 ## What each piece does
 
