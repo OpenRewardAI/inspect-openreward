@@ -25,6 +25,3 @@ packages = ["src/inspect_openreward"]
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
-
-#[tool.uv.sources]
-#openreward = { path = "../gr/or/python-sdk" }
