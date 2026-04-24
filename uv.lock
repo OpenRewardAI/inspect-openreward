@@ -925,7 +925,7 @@ wheels = [
 
 [[package]]
 name = "inspect-openreward"
-version = "0.1.1"
+version = "0.2.0"
 source = { editable = "." }
 dependencies = [
     { name = "inspect-ai" },
@@ -1496,7 +1496,7 @@ wheels = [
 
 [[package]]
 name = "openreward"
-version = "0.1.104"
+version = "0.1.106"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -1513,9 +1513,9 @@ dependencies = [
     { name = "typing-extensions" },
     { name = "uvicorn" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c7/94/3e20eee8058f5699b3034635ad649a0d4a45ce9c7285dc80f7d04d480a70/openreward-0.1.104.tar.gz", hash = "sha256:b1115bf78510db0bf09a8ab4b7705389180e00e03160d2a7c9c4a1f79416fa44", size = 124199, upload-time = "2026-04-22T15:12:55.003Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/2f/45/e99ab66ea7e097d6be6629674cc0aaf22241897ba5056ded4399a861fabb/openreward-0.1.106.tar.gz", hash = "sha256:01f18c06005e2a00345066c8c957be6f7eebe68f0e22fd217bc9f331f9193ce6", size = 125851, upload-time = "2026-04-24T14:13:22.217Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/67/c7/8071f4cde601646b6cc052303acc80cf55a3cc378b2915838ae32b696538/openreward-0.1.104-py3-none-any.whl", hash = "sha256:ccbf2942789458d650fa2998a8eeefbddb23b8e6192dd0aa20696ef3bde4ef4b", size = 125233, upload-time = "2026-04-22T15:12:53.613Z" },
+    { url = "https://files.pythonhosted.org/packages/86/5b/dffab12fd465fdd3ed2b75f41a601be59c3436d4a6da999f73b59a4fa389/openreward-0.1.106-py3-none-any.whl", hash = "sha256:9d39432e8dbef417d3da7f9e490eef1e7d329110132ef217a424a262b2eb0c28", size = 127398, upload-time = "2026-04-24T14:13:20.608Z" },
 ]
 
 [[package]]

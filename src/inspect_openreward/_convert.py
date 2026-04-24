@@ -8,6 +8,8 @@ from inspect_ai.tool._tool_params import ToolParams
 from openreward import Provider, ToolSpec, sanitize_tool_schema
 from openreward.api.environments.client import Session
 
+from ._shared import ensure_param_descriptions
+
 
 def openreward_tool_to_inspect(
     tool_spec: ToolSpec,
@@ -31,6 +33,7 @@ def openreward_tool_to_inspect(
         if provider is None
         else sanitize_tool_schema(tool_spec.input_schema, provider)
     )
+    ensure_param_descriptions(parameters, name)
 
     return ToolDef(
         tool=execute,

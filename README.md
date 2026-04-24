@@ -18,34 +18,7 @@ Set `OPENREWARD_API_KEY` and whichever model provider keys you need (`OPENAI_API
 
 ## Quickstart
 
-```python
-from inspect_ai import Task, eval, task
-from openreward import OpenReward
-
-from inspect_openreward import (
-    openreward_dataset,
-    openreward_scorer,
-    openreward_solver,
-)
-
-
-@task
-def endless_terminals() -> Task:
-    env = OpenReward().environments.get(name="kanishk/EndlessTerminals")
-    return Task(
-        dataset=openreward_dataset(env, split="train", limit=10),
-        solver=openreward_solver(env),
-        scorer=openreward_scorer(),
-    )
-
-
-if __name__ == "__main__":
-    eval(endless_terminals, model="openai/gpt-4.1")
-```
-
-The zero-arg `openreward_solver(env)` call runs the default react-style loop (`generate(tool_calls="loop")`) against the environment's tools — nothing else to configure.
-
-See [`./src/example/endless_terminals.py`](./src/example/endless_terminals.py) for a runnable version with both the default and a custom-chain task.
+See [`./src/example/terminal_bench_2_verified.py`](./src/example/terminal_bench_2_verified.py) for a runnable version with both a default, and a customer solver chain, task.
 
 ## Custom solver chains
 
@@ -55,16 +28,17 @@ See [`./src/example/endless_terminals.py`](./src/example/endless_terminals.py) f
 from inspect_ai.solver import chain, generate, system_message
 
 @task
-def endless_terminals_custom() -> Task:
-    env = OpenReward().environments.get(name="kanishk/EndlessTerminals")
+def terminal_bench_2_verified_custom() -> Task:
+    env = OpenReward().environments.get(name="GeneralReasoning/terminal-bench-2-verified")
     return Task(
-        dataset=openreward_dataset(env, split="train", limit=10),
+        dataset=openreward_dataset(env, split="test", limit=10),
         solver=openreward_solver(
             env,
             chain(
                 system_message("Think carefully before each tool call."),
                 generate(tool_calls="loop"),
             ),
+            toolset="claude-code"
         ),
         scorer=openreward_scorer(),
     )
@@ -93,7 +67,7 @@ Session-lifecycle wrapper around an arbitrary inner solver chain. Per sample it:
 
 - `environment`: the OpenReward `Environment` to open sessions against. The dataset should be built from the same environment.
 - `solver`: inner solver (or `list[Solver]`, normalised via `inspect_ai.solver.chain`). Defaults to `generate(tool_calls="loop")`.
-- `toolset` *(keyword-only)*: optional OpenReward toolset name passed to `environment.session(...)` — e.g. `"claude-code"` for a harness-native bash tool surface instead of the environment's own tools.
+- `toolset` *(keyword-only)*: optional OpenReward toolset name passed to `environment.session(...)` — e.g. `"claude-code"` for a harness-native bash tool surface in addition to the environment's own tools.
 - `tool_choice` *(keyword-only)*: passed through to Inspect's `state.tool_choice`.
 
 Inner chains can layer on further tools via `use_tools(extra_tools, append=True)` — the session-bound tools installed by the wrapper remain available.

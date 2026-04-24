@@ -21,6 +21,7 @@ from ._constants import (
     REWARD_METADATA_KEY,
     TASK_METADATA_KEY,
 )
+from ._shared import ensure_param_descriptions
 
 _INSPECT_API_TO_OR_PROVIDER: dict[str, Provider] = {
     "openai": "openai",
@@ -141,11 +142,12 @@ def _wrap_tool(
             block.text for block in result.blocks if isinstance(block, TextBlock)
         )
 
+    schema = sanitize_tool_schema(tool_spec.input_schema, provider_format)
+    ensure_param_descriptions(schema, name)
+
     return ToolDef(
         tool=execute,
         name=name,
         description=tool_spec.description,
-        parameters=ToolParams(
-            **sanitize_tool_schema(tool_spec.input_schema, provider_format)
-        ),
+        parameters=ToolParams(**schema),
     ).as_tool()
