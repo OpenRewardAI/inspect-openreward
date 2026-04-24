@@ -13,8 +13,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
       - name: Check version is bumped
         uses: ./.github/workflows/check-pypi-version-bump
         with:
+          pyproject-path: ./pyproject.toml
           package-name: inspect-openreward
