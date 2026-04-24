@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "inspect-openreward"
 version = "0.0.1"
-description = "Bridge between Inspect AI tools and the OpenReward specification."
+description = "Run OpenReward environments through the Inspect eval platform"
 readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"
@@ -37,7 +37,7 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://github.com/OpenRewardAI/inspect-openreward"
-Repository = "https://github.com/OpenRewardAI/inspect-openreward"
+Source = "https://github.com/OpenRewardAI/inspect-openreward"
 Issues = "https://github.com/OpenRewardAI/inspect-openreward/issues"
 
 [dependency-groups]

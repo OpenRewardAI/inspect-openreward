@@ -1,4 +1,4 @@
-"""Run an Inspect AI eval against an OpenReward environment.
+"""Run an Inspect eval against an OpenReward environment.
 
 Assumes OPENAI_API_KEY and OPENREWARD_API_KEY are set (e.g. via a .env file).
 """

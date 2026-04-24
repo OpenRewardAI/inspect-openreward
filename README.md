@@ -1,6 +1,9 @@
 # inspect-openreward
 
-Run [OpenReward](https://docs.openreward.ai/) environments as [Inspect AI](https://inspect.aisi.org.uk/) evals.
+[![PyPI version](https://img.shields.io/pypi/v/inspect-openreward)](https://pypi.org/project/inspect-openreward/)
+[![Python](https://img.shields.io/badge/python-%3E%3D3.11-green)](https://pypi.org/project/inspect-openreward/)
+
+Run [OpenReward](https://docs.openreward.ai/) environments as [Inspect](https://inspect.aisi.org.uk/) evals.
 
 Provides an Inspect-native `Dataset`, `Scorer`, and a session-lifecycle wrapper solver for any OpenReward environment, so you get Inspect's eval harness, transcript viewer, metrics, and model abstraction for free — and OpenReward's tools, tasks, and rewards surface as first-class Inspect primitives. The wrapper takes an arbitrary inner solver chain, so you can keep the default react-style loop or plug in your own scaffolding (`system_message`, `basic_agent`, `react`, custom `@solver`, …) without touching session management.
 

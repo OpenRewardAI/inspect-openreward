@@ -14,7 +14,7 @@ def openreward_tool_to_inspect(
     session: Session,
     provider: Optional[Provider] = None,
 ) -> Tool:
-    """Convert an OpenReward ToolSpec into an Inspect AI Tool.
+    """Convert an OpenReward ToolSpec into an Inspect Tool.
 
     ``provider`` selects provider-specific sanitization of the tool's JSON
     schema via ``openreward.sanitize_tool_schema``. Pass ``None`` to leave the
