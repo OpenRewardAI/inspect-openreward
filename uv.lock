@@ -940,7 +940,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "inspect-ai" },
+    { name = "inspect-ai", specifier = ">=0.3.205" },
     { name = "openreward", specifier = ">=0.1.104" },
 ]
 

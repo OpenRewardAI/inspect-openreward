@@ -8,10 +8,37 @@ version = "0.1.0"
 description = "Bridge between Inspect AI tools and the OpenReward specification."
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = [
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "General Reasoning", email = "hello@gr.inc" }]
+keywords = [
     "inspect-ai",
+    "openreward",
+    "evals",
+    "llm",
+    "agents",
+    "reinforcement-learning",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "inspect-ai>=0.3.205",
     "openreward>=0.1.104",
 ]
+
+[project.urls]
+Homepage = "https://github.com/OpenRewardAI/inspect-openreward"
+Repository = "https://github.com/OpenRewardAI/inspect-openreward"
+Issues = "https://github.com/OpenRewardAI/inspect-openreward/issues"
 
 [dependency-groups]
 dev = [
