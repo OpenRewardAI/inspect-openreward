@@ -4,7 +4,7 @@ from typing import Any, Optional
 
 from inspect_ai._util.content import ContentImage, ContentText
 from inspect_ai.model import ChatMessageUser
-from inspect_ai.solver import Generate, Solver, TaskState, solver
+from inspect_ai.solver import Generate, Solver, TaskState, chain, solver
 from inspect_ai.tool import Tool, ToolChoice, ToolDef
 from inspect_ai.tool._tool_params import ToolParams
 from openreward import (
@@ -35,29 +35,45 @@ _INSPECT_API_TO_OR_PROVIDER: dict[str, Provider] = {
 @solver
 def openreward_solver(
     environment: Environment,
+    solver: Optional[Solver | list[Solver]] = None,
+    *,
     toolset: Optional[BuiltinToolset] = None,
     tool_choice: ToolChoice = "auto",
 ) -> Solver:
-    """Solver that runs an Inspect agent against an OpenReward session.
+    """Wrap an Inspect solver chain with OpenReward session lifecycle management.
 
-    Per sample, this solver:
+    Per sample, this wrapper:
       1. Opens an `environment.session(task=..., toolset=toolset)`.
-      2. Fetches `session.get_prompt()` and appends it as a user message.
-      3. Converts `session.list_tools()` into Inspect tools, auto-detecting
-         the JSON-schema sanitisation format from the model provider.
-      4. Delegates to `generate(tool_calls="loop")` to run the react-style loop.
+      2. Fetches `session.get_prompt()` and injects it as the user message.
+      3. Converts `session.list_tools()` into Inspect tools (auto-detecting the
+         JSON-schema sanitisation format from the model provider) and installs
+         them onto `state.tools`, along with `state.tool_choice`.
+      4. Runs the caller-supplied inner `solver` (or `generate(tool_calls="loop")`
+         by default) inside the open session.
       5. Captures the terminal `reward` / `finished` from tool outputs into
-         `state.metadata`, where `openreward_scorer` can read them.
+         `state.metadata`, where `openreward_scorer` can read them. This works
+         regardless of how the inner chain invokes tools.
       6. Closes the session on teardown.
 
     Args:
         environment: The OpenReward `Environment` to open sessions against.
             The dataset should be built from the same environment.
+        solver: Inner solver (or list of solvers, composed via `chain(...)`)
+            to run inside the session. Defaults to `generate(tool_calls="loop")`,
+            which reproduces the react-style loop. Pass e.g.
+            `chain(system_message("..."), generate())` or `basic_agent(...)`
+            to plug in different scaffolding. Inner chains can add further
+            tools via `use_tools(extra, append=True)`; the session-bound
+            tools installed here will remain available.
         toolset: Optional toolset name to pass to `environment.session(...)`.
             E.g. `"claude-code"` to expose a harness-native bash tool surface
             instead of the environment's own tools.
         tool_choice: Passed through to Inspect's `state.tool_choice`.
     """
+
+    inner: Optional[Solver] = (
+        chain(*solver) if isinstance(solver, list) else solver
+    )
 
     async def solve(state: TaskState, generate: Generate) -> TaskState:
         task = (state.metadata or {}).get(TASK_METADATA_KEY)
@@ -84,7 +100,10 @@ def openreward_solver(
             ]
             state.tool_choice = tool_choice
 
-            state = await generate(state, tool_calls="loop")
+            if inner is None:
+                state = await generate(state, tool_calls="loop")
+            else:
+                state = await inner(state, generate)
 
         return state
 

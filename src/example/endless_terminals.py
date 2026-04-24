@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from dotenv import load_dotenv
 from inspect_ai import Task, eval, task
+from inspect_ai.solver import chain, generate, system_message
 from openreward import OpenReward
 
 from inspect_openreward import (
@@ -28,10 +29,29 @@ def endless_terminals() -> Task:
     )
 
 
+@task
+def endless_terminals_with_custom_system_prompt() -> Task:
+    """Same environment, but with a custom solver chain plugged into the wrapper."""
+    env = OpenReward().environments.get(name="kanishk/EndlessTerminals")
+    return Task(
+        dataset=openreward_dataset(env, split="train", limit=1),
+        solver=openreward_solver(
+            env,
+            chain(
+                system_message(
+                    "Think carefully about each step before calling a tool."
+                ),
+                generate(tool_calls="loop"),
+            ),
+        ),
+        scorer=openreward_scorer(),
+    )
+
+
 def main() -> None:
     load_dotenv()
     eval(endless_terminals, model=f"openai/{MODEL_NAME}")
-    print("")
+    eval(endless_terminals_with_custom_system_prompt, model=f"openai/{MODEL_NAME}")
 
 
 if __name__ == "__main__":
