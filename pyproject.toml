@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "inspect-openreward"
-version = "0.1.1"
+version = "0.2.0"
 description = "Run OpenReward environments through the Inspect eval platform"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -52,3 +52,6 @@ packages = ["src/inspect_openreward"]
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
+
+#[tool.uv.sources]
+#openreward = { path = "../gr/or/python-sdk" }
