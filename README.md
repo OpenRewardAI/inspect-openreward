@@ -18,7 +18,7 @@ Set `OPENREWARD_API_KEY` and whichever model provider keys you need (`OPENAI_API
 
 ## Quickstart
 
-See [`./src/example/terminal_bench_2_verified.py`](./src/example/terminal_bench_2_verified.py) for a runnable version with both a default, and a customer solver chain, task.
+See [`./src/example/terminal_bench_2_verified.py`](./src/example/terminal_bench_2_verified.py) for a runnable version with both a default, and a customer solver chain, task. [`./src/example/terminal_bench_2_verified_example_output.txt`](./src/example/terminal_bench_2_verified_example_output.txt) contains a sample output from running the example against Kimi K2.6 Reasoning.
 
 ## Custom solver chains
 
