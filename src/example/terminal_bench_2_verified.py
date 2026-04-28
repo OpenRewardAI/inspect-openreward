@@ -16,8 +16,7 @@ from inspect_openreward import (
     openreward_solver,
 )
 
-MODEL_NAME = "gpt-5.4"
-
+MODEL_NAME = "openai/gpt-5.4"
 
 @task
 def terminal_bench_2_verified() -> Task:
@@ -55,10 +54,10 @@ def terminal_bench_2_verified_with_custom_system_prompt() -> Task:
 
 def main() -> None:
     load_dotenv()
-    eval(terminal_bench_2_verified, model=f"openai/{MODEL_NAME}")
+    eval(terminal_bench_2_verified, model=MODEL_NAME)
     eval(
         terminal_bench_2_verified_with_custom_system_prompt,
-        model=f"openai/{MODEL_NAME}",
+        model=MODEL_NAME,
     )
 
 
