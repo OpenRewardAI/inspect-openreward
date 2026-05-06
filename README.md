@@ -20,6 +20,10 @@ Set `OPENREWARD_API_KEY` and whichever model provider keys you need (`OPENAI_API
 
 See [`./src/example/terminal_bench_2_verified.py`](./src/example/terminal_bench_2_verified.py) for a runnable version with both a default, and a customer solver chain, task. [`./src/example/terminal_bench_2_verified_example_output.txt`](./src/example/terminal_bench_2_verified_example_output.txt) contains a sample output from running the example against Kimi K2.6 Reasoning.
 
+## Benchmark results
+
+To validate the integration end-to-end, we ran all 87 of the [Terminal Bench 2 Verified](https://openreward.ai/GeneralReasoning/terminal-bench-2-verified) environment, with Anthropic Sonnet 4.5 driving the Claude Code toolset, scoring **55.0%**. This lines up closely with our September 2025 benchmark of the same combination, with the ~5% uplift likely reflecting six months of model and harness improvements.
+
 ## Custom solver chains
 
 `openreward_solver` is a wrapper: it owns session open/close, prompt injection, tool conversion + installation, and reward capture, and then runs whatever inner solver chain you hand it. That means any Inspect solver composition slots in — chain together `system_message`, `prompt_template`, `chain_of_thought`, `self_critique`, `use_tools(..., append=True)`, `basic_agent`, `react`, or your own `@solver` — and the OpenReward session-bound tools remain available throughout:
