@@ -925,7 +925,7 @@ wheels = [
 
 [[package]]
 name = "inspect-openreward"
-version = "0.2.0"
+version = "0.3.0"
 source = { editable = "." }
 dependencies = [
     { name = "inspect-ai" },
@@ -941,7 +941,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "inspect-ai", specifier = ">=0.3.205" },
-    { name = "openreward", specifier = ">=0.1.104" },
+    { name = "openreward", directory = "../gr/or/python-sdk" },
 ]
 
 [package.metadata.requires-dev]
@@ -1496,8 +1496,8 @@ wheels = [
 
 [[package]]
 name = "openreward"
-version = "0.1.106"
-source = { registry = "https://pypi.org/simple" }
+version = "0.1.115"
+source = { directory = "../gr/or/python-sdk" }
 dependencies = [
     { name = "aiohttp" },
     { name = "anthropic" },
@@ -1513,10 +1513,38 @@ dependencies = [
     { name = "typing-extensions" },
     { name = "uvicorn" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/2f/45/e99ab66ea7e097d6be6629674cc0aaf22241897ba5056ded4399a861fabb/openreward-0.1.106.tar.gz", hash = "sha256:01f18c06005e2a00345066c8c957be6f7eebe68f0e22fd217bc9f331f9193ce6", size = 125851, upload-time = "2026-04-24T14:13:22.217Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/86/5b/dffab12fd465fdd3ed2b75f41a601be59c3436d4a6da999f73b59a4fa389/openreward-0.1.106-py3-none-any.whl", hash = "sha256:9d39432e8dbef417d3da7f9e490eef1e7d329110132ef217a424a262b2eb0c28", size = 127398, upload-time = "2026-04-24T14:13:20.608Z" },
+
+[package.metadata]
+requires-dist = [
+    { name = "aiohttp", specifier = ">=3.13.2" },
+    { name = "anthropic", specifier = ">=0.69.0" },
+    { name = "black", marker = "extra == 'dev'", specifier = ">=23.0.0" },
+    { name = "click", specifier = ">=8.0.0" },
+    { name = "fastapi", specifier = ">=0.115.12" },
+    { name = "google-genai", specifier = ">=1.4.0" },
+    { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.0.0" },
+    { name = "openai", specifier = ">=1.88.0" },
+    { name = "openpyxl", marker = "extra == 'tools'", specifier = ">=3.1.0" },
+    { name = "pdf2image", marker = "extra == 'tools'", specifier = ">=1.16.0" },
+    { name = "pdfplumber", marker = "extra == 'tools'", specifier = ">=0.11.0" },
+    { name = "pydantic", specifier = ">=2.11.5" },
+    { name = "pypdf", marker = "extra == 'tools'", specifier = ">=4.0.0" },
+    { name = "pyright", marker = "extra == 'dev'", specifier = ">=1.1.409" },
+    { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0.0" },
+    { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = ">=0.21.0" },
+    { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.0.0" },
+    { name = "python-docx", marker = "extra == 'tools'", specifier = ">=1.1.0" },
+    { name = "python-pptx", marker = "extra == 'tools'", specifier = ">=0.6.21" },
+    { name = "pyyaml", specifier = ">=6.0" },
+    { name = "reportlab", marker = "extra == 'tools'", specifier = ">=4.0.0" },
+    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.1.0" },
+    { name = "sse-starlette", specifier = "==2.3.6" },
+    { name = "structlog", specifier = ">=24.1.0" },
+    { name = "tenacity", specifier = ">=9.1.2" },
+    { name = "typing-extensions", specifier = ">=4.9.0" },
+    { name = "uvicorn", specifier = ">=0.34.3" },
 ]
+provides-extras = ["dev", "tools"]
 
 [[package]]
 name = "packaging"

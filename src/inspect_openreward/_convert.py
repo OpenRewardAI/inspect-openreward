@@ -6,14 +6,14 @@ from inspect_ai.tool._tool import Tool
 from inspect_ai.tool._tool_def import ToolDef
 from inspect_ai.tool._tool_params import ToolParams
 from openreward import Provider, ToolSpec, sanitize_tool_schema
-from openreward.api.environments.client import Session
+from openreward.api.environments.client import AsyncSession
 
 from ._shared import ensure_param_descriptions
 
 
 def openreward_tool_to_inspect(
     tool_spec: ToolSpec,
-    session: Session,
+    session: AsyncSession,
     provider: Optional[Provider] = None,
 ) -> Tool:
     """Convert an OpenReward ToolSpec into an Inspect Tool.
@@ -25,7 +25,7 @@ def openreward_tool_to_inspect(
     name = tool_spec.name
 
     async def execute(**kwargs: Any) -> str:
-        result = session.call_tool(name, kwargs)
+        result = await session.call_tool(name, kwargs)
         return result.blocks[0].text if result.blocks else ""
 
     parameters = (
